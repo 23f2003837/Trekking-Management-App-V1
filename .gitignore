@@ -3,3 +3,4 @@ __pycache__/
 *.__pyc 
 instance/
 .env
+token.txt
