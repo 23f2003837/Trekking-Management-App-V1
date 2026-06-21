@@ -40,7 +40,16 @@
     <nav class="navbar navbar-dark bg-teal-dark px-3">
         <a class="navbar-brand text-offwhite" href="/">TrekManager</a>
     </nav>
+    
     <div class="container mt-4">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert bg-ice mt-3">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
         {% block content %}
         {% endblock %}
     </div>
