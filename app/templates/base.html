@@ -42,6 +42,7 @@
     </nav>
     
     <div class="container mt-4">
+        
         {% with messages = get_flashed_messages() %}
             {% if messages %}
                 {% for message in messages %}
@@ -52,7 +53,9 @@
         
         {% block content %}
         {% endblock %}
+
     </div>
+    
     <footer class="bg-teal-dark text-offwhite text-center py-0.40">
       <p>IIT MADRAS BS DATA SCIENCE, MAD1 PROJECT</p>
     </footer>

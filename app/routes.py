@@ -2,10 +2,14 @@ from flask import Blueprint,render_template,request,redirect,url_for,session,fla
 from app.models import User
 from app import db
 from werkzeug.security import generate_password_hash,check_password_hash
+from app.decorators import login_required
+
 main=Blueprint('main',__name__)
+
 @main.route("/")
 def home():
     return render_template('home.html')
+
 @main.route("/login",methods=['GET','POST'])
 def login():
     if request.method=="POST":
@@ -18,13 +22,14 @@ def login():
                 flash("Successfully Login")
                 session['user_id']=existing_user.id
                 session['role']=existing_user.role
-                return redirect(url_for("main.home"))
+                return redirect(url_for("main.dashboard"))
             else:
                 flash("Incorrect Password")
                 return redirect(url_for("main.login"))
         flash("Please register")
         return redirect(url_for("main.register"))
     return render_template("login.html")
+
 @main.route("/register",methods=['GET','POST'])
 def register():
     if request.method=='POST':
@@ -43,3 +48,14 @@ def register():
         flash("Registration successful! Please Login")
         return redirect(url_for("main.login"))
     return render_template('register.html')
+
+@main.route('/logout')
+def logout():
+    session.clear()
+    flash("You have been logged out successfully")
+    return redirect(url_for("main.home"))
+
+@main.route('/dashboard')
+@login_required
+def dashboard():
+    return f"Welcome to Dashboard, Your role is {session['role']}"
