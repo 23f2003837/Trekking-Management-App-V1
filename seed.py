@@ -9,7 +9,8 @@ with app.app_context():
         name='admin',
         email='admin@trekking.com',
         password=generate_password_hash('whotfareu'),
-        role='admin'
+        role='admin',
+        is_approved=True
         )
         db.session.add(admin)
         db.session.commit()
