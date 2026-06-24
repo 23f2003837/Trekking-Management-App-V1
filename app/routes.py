@@ -2,7 +2,7 @@ from flask import Blueprint,render_template,request,redirect,url_for,session,fla
 from app.models import User
 from app import db
 from werkzeug.security import generate_password_hash,check_password_hash
-from app.decorators import login_required
+from app.decorators import login_as_admin, login_as_staff, login_as_trekker
 
 main=Blueprint('main',__name__)
 
@@ -30,11 +30,11 @@ def login():
                     session['user_id']=existing_user.id
                     session['role']=existing_user.role
                     if session['role']=='staff':
-                        return redirect(url_for("main.dashboard"))#todo--> need to be built
+                        return redirect(url_for("main.staff_dashboard"))
                     elif session['role']=='admin':
-                        return redirect(url_for("main.dashboard"))#todo--> need to be built
+                        return redirect(url_for("main.admin_dashboard"))
                     else:
-                        return redirect(url_for("main.dashboard"))#todo--> need to be built
+                        return redirect(url_for("main.trekker_dashboard"))
             else:
                 flash("Incorrect Password")
                 return redirect(url_for("main.login"))
@@ -78,7 +78,17 @@ def logout():
     flash("You have been logged out successfully")
     return redirect(url_for("main.home"))
 
-@main.route('/dashboard')
-@login_required
-def dashboard():
-    return render_template("dashboard.html")
+@main.route('/admin_dashboard')
+@login_as_admin
+def admin_dashboard():
+    return render_template("admin_dashboard.html")
+
+@main.route('/staff_dashboard')
+@login_as_staff
+def staff_dashboard():
+    return render_template("staff_dashboard.html")
+
+@main.route('/trekker_dashboard')
+@login_as_trekker
+def trekker_dashboard():
+    return render_template("trekker_dashboard.html")
