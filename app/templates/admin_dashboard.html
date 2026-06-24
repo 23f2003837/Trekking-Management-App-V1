@@ -36,6 +36,37 @@
         </div>
     </div>
     </div>
-
 </div>
+<div class="d-flex justify-content-between align-items-center p-3">
+    <h5 class="text-teal-dark m-0">Recent Bookings</h5>
+    <a class="text-teal-muted" href="{{ url_for('main.all_bookings') }}">View all Bookings →</a>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th class="text-teal-dark">Booking Id</th>
+            <th class="text-teal-dark">User</th>
+            <th class="text-teal-dark">Trek</th>
+            <th class="text-teal-dark">Date</th>
+            <th class="text-teal-dark">Status</th>
+            <th class="text-teal-dark">Payment Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for booking in recent_bookings %}
+        <tr>
+            <td class="text-teal-dark">{{ booking.id }}</td>
+            <td class="text-teal-dark">{{ booking.user.name }}</td>
+            <td class="text-teal-dark">{{ booking.trek.name }}</td>
+            <td class="text-teal-dark">{{ booking.booking_date.strftime('%d %b %Y') }}</td>
+            <td class="text-teal-dark">{{ booking.status }}</td>
+            <td class="text-teal-dark">{{ booking.payment_status }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="5" class="text-center text-teal-dark">No Bookings yet!</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

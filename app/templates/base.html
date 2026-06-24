@@ -38,16 +38,27 @@
 </head>
 <body>
     <nav class="navbar navbar-dark bg-teal-dark px-3">
-        <a class="navbar-brand text-offwhite" href="/">TrekManager</a>
+        <a class="navbar-brand text-offwhite" href="{{ url_for("main.home") }}">TrekManager</a>
+        
         {% if not session.user_id%}
             <!-- show register,login stuff -->
-             <div>
-            <a class="navbar-brand text-offwhite" href='{{ url_for("main.login") }}'>Login</a>
-            <a class="navbar-brand text-offwhite" href='{{ url_for("main.register") }}'>Register</a>
-                </div>
+            <div>
+                <a class="nav-link text-offwhite d-inline" href="{{ url_for("main.login") }}">Login  ||  </a>
+                <a class="nav-link text-offwhite d-inline" href="{{ url_for("main.register") }}">Register</a>
+            </div>
         {% else %}
             <!-- show logout, dashboard stuff-->
-            <a class="navbar-brand text-offwhite" href='{{ url_for("main.logout") }}'>Logout</a>
+            <div>
+                {% if session['role']=='admin' %}
+                    <a class="nav-link text-offwhite d-inline" href="{{ url_for("main.admin_dashboard") }}">Dashboard</a>
+                {% elif session['role']=='trekker' %}
+                    <a class="nav-link text-offwhite d-inline" href="{{ url_for("main.trekker_dashboard") }}">Dashboard</a>
+                {% elif session['role']=='staff' %}
+                    <a class="nav-link text-offwhite d-inline" href="{{ url_for("main.staff_dashboard") }}">Dashboard</a>
+                {% endif %}
+                <span class="text-offwhite mx-2">|</span>               
+                <a class="nav-link text-offwhite d-inline" href="{{ url_for("main.logout") }}">Logout</a>
+            </div>
         {% endif %}
     </nav>
     
@@ -66,7 +77,7 @@
 
     </div>
     
-    <footer class="bg-teal-dark text-offwhite text-center py-0.40">
+    <footer class="bg-teal-dark text-offwhite text-center py-2">
       <p>IIT MADRAS BS DATA SCIENCE, MAD1 PROJECT</p>
     </footer>
 </body>
