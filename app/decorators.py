@@ -44,7 +44,6 @@ def login_as_staff(f):
         if blacklisted:
             return blacklisted
         
-        
         if session['role']!='staff':
             flash(f'Access Denied')
             return redirect(url_for(f"main.{session['role']}_dashboard"))

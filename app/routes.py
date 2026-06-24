@@ -1,5 +1,5 @@
 from flask import Blueprint,render_template,request,redirect,url_for,session,flash
-from app.models import User
+from app.models import User, Trek, Booking, StaffProfile
 from app import db
 from werkzeug.security import generate_password_hash,check_password_hash
 from app.decorators import login_as_admin, login_as_staff, login_as_trekker
@@ -81,7 +81,11 @@ def logout():
 @main.route('/admin_dashboard')
 @login_as_admin
 def admin_dashboard():
-    return render_template("admin_dashboard.html")
+    total_treks=Trek.query.count()
+    total_users=User.query.filter_by(role='trekker').count()
+    total_bookings=Booking.query.count()
+    total_staff=User.query.filter_by(role='staff').count()
+    return render_template("admin_dashboard.html",total_treks=total_treks,total_users=total_users,total_bookings=total_bookings,total_staff=total_staff)
 
 @main.route('/staff_dashboard')
 @login_as_staff

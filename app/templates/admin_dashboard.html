@@ -1,4 +1,41 @@
 {% extends 'base.html' %}
 {% block content %}
-    <h1>welcome admin lala</h1>
+<div class="row">
+    <div class="col-md-3">
+    <div class="card text-center">
+        <div class="card-body bg-sage">
+            <h5 class="card-title text-teal-dark">Total Treks</h5>
+            <p class="card-text fs-3 text-teal-dark">{{ total_treks }}</p>
+        </div>
+    </div>
+    </div>
+
+    <div class="col-md-3">
+    <div class="card text-center">
+        <div class="card-body bg-sage">
+            <h5 class="card-title text-teal-dark">Total Users</h5>
+            <p class="card-text fs-3 text-teal-dark">{{ total_users }}</p>
+        </div>
+    </div>
+    </div>
+
+    <div class="col-md-3">
+    <div class="card text-center">
+        <div class="card-body bg-sage">
+            <h5 class="card-title text-teal-dark">Total Bookings</h5>
+            <p class="card-text fs-3 text-teal-dark">{{ total_bookings }}</p>
+        </div>
+    </div>
+    </div>
+
+    <div class="col-md-3">
+    <div class="card text-center">
+        <div class="card-body bg-sage">
+            <h5 class="card-title text-teal-dark">Total Staff</h5>
+            <p class="card-text fs-3 text-teal-dark">{{ total_staff }}</p>
+        </div>
+    </div>
+    </div>
+
+</div>
 {% endblock %}
