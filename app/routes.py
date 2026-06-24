@@ -3,6 +3,7 @@ from app.models import User, Trek, Booking, StaffProfile
 from app import db
 from werkzeug.security import generate_password_hash,check_password_hash
 from app.decorators import login_as_admin, login_as_staff, login_as_trekker
+from datetime import datetime
 
 main=Blueprint('main',__name__)
 
@@ -98,10 +99,36 @@ def all_bookings():
 @main.route("/admin_dashboard/all_treks")
 @login_as_admin
 def all_treks():
-    all_treks=Trek.query.all()
+    search=request.args.get('search','')
+    if search:
+        all_treks=Trek.query.filter(Trek.name.ilike(f'%{search}%')).all()
+    else:
+        all_treks=Trek.query.all()
     return render_template("all_treks.html",all_treks=all_treks)
-
-
+@main.route('/admin_dashboard/create_trek',methods=['GET','POST'])
+@login_as_admin
+def create_trek():
+    if request.method=='POST':
+        name=request.form.get('name')
+        location=request.form.get('location')
+        difficulty=request.form.get('difficulty')
+        start_date=datetime.strptime(request.form['start_date'],"%Y-%m-%d")
+        end_date=datetime.strptime(request.form['end_date'],"%Y-%m-%d")
+        total_slots=int(request.form.get("total_slots"))
+        duration=(end_date-start_date).days+1
+        description=request.form.get('description')
+        status=request.form.get('status')
+        assigned_staff_id=request.form.get('assigned_staff_id')
+        assigned_staff_id=int(assigned_staff_id) if assigned_staff_id else None
+        new_trek=Trek(name=name,location=location,difficulty=difficulty,start_date=start_date,end_date=end_date
+                      ,total_slots=total_slots,available_slots=total_slots,duration=duration,description=description,
+                      status=status,assigned_staff_id=assigned_staff_id)
+        db.session.add(new_trek)
+        db.session.commit()
+        flash("Trek created successfully!")
+        return redirect(url_for("main.all_treks"))
+    staff_list=User.query.filter_by(role='staff',is_approved=True).all()
+    return render_template('create_trek.html',staff_list=staff_list) #get to create trek form 
 @main.route('/staff_dashboard')
 @login_as_staff
 def staff_dashboard():

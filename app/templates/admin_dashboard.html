@@ -50,7 +50,7 @@
             <th class="text-teal-dark">Booking Id</th>
             <th class="text-teal-dark">User</th>
             <th class="text-teal-dark">Trek</th>
-            <th class="text-teal-dark">Date</th>
+            <th class="text-teal-dark">Booking Date</th>
             <th class="text-teal-dark">Status</th>
             <th class="text-teal-dark">Payment Status</th>
         </tr>
@@ -87,12 +87,10 @@
             <th class="text-teal-dark">Start Date</th>
             <th class="text-teal-dark">End Date</th>
             <th class="text-teal-dark">Duration</th>
-            <th class="text-teal-dark">Difficulty</th>
             <th class="text-teal-dark">Trek Status</th>
             <th class="text-teal-dark">Available Slots</th>
             <th class="text-teal-dark">Total Slots</th>
             <th class="text-teal-dark">Assigned Guide</th>
-            <th class="text-teal-dark">Trek Description</th>
         
         </tr>
     </thead>
@@ -105,12 +103,10 @@
             <td class="text-teal-dark">{{ trek.start_date.strftime('%d %b %Y') }}</td>
             <td class="text-teal-dark">{{ trek.end_date.strftime('%d %b %Y') }}</td>
             <td class="text-teal-dark">{{ trek.duration }}</td>
-            <td class="text-teal-dark">{{ trek.difficulty }}</td>
             <td class="text-teal-dark">{{ trek.status }}</td>
             <td class="text-teal-dark">{{ trek.available_slots }}</td>
             <td class="text-teal-dark">{{ trek.total_slots }}</td>
-            <td class="text-teal-dark">{{ trek.assigned_staff.name }}</td>
-            <td class="text-teal-dark">{{ trek.description }}</td>
+            <td class="text-teal-dark">{{ trek.assigned_staff.name if trek.assigned_staff else 'Not assigned' }}</td>
         </tr>
         {% else %}
         <tr>
