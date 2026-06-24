@@ -86,14 +86,20 @@ def admin_dashboard():
     total_bookings=Booking.query.count()
     total_staff=User.query.filter_by(role='staff').count()
     recent_bookings=Booking.query.order_by(Booking.booking_date.desc()).limit(5).all()
+    recent_treks=Trek.query.order_by(Trek.start_date.desc()).limit(5).all()
     return render_template("admin_dashboard.html",total_treks=total_treks,total_users=total_users,
-                           total_bookings=total_bookings,total_staff=total_staff,recent_bookings=recent_bookings)
+                           total_bookings=total_bookings,total_staff=total_staff,recent_bookings=recent_bookings
+                           ,recent_treks=recent_treks)
 @main.route("/admin_dashboard/all_bookings")
 @login_as_admin
 def all_bookings():
     all_bookings=Booking.query.all()
     return render_template("all_bookings.html",all_bookings=all_bookings)
-
+@main.route("/admin_dashboard/all_treks")
+@login_as_admin
+def all_treks():
+    all_treks=Trek.query.all()
+    return render_template("all_treks.html",all_treks=all_treks)
 
 
 @main.route('/staff_dashboard')
