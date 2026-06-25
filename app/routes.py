@@ -129,6 +129,31 @@ def create_trek():
         return redirect(url_for("main.all_treks"))
     staff_list=User.query.filter_by(role='staff',is_approved=True).all()
     return render_template('create_trek.html',staff_list=staff_list) #get to create trek form 
+
+@main.route('/admin_dashboard/edit_trek/<int:trek_id>',methods=['GET','POST'])
+@login_as_admin
+def edit_trek(trek_id):
+    trek=Trek.query.get_or_404(trek_id)
+    if request.method=='POST':
+        trek.name=request.form.get('name')
+        trek.location=request.form.get('location')
+        trek.difficulty=request.form.get('difficulty')
+        trek.start_date=datetime.strptime(request.form['start_date'],"%Y-%m-%d")
+        trek.end_date=datetime.strptime(request.form['end_date'],"%Y-%m-%d")
+        booked_count=trek.total_slots-trek.available_slots
+        trek.total_slots=int(request.form.get("total_slots"))
+        trek.available_slots=trek.total_slots-booked_count
+        trek.duration=(trek.end_date-trek.start_date).days+1
+        trek.description=request.form.get('description')
+        trek.status=request.form.get('status')
+        trek.assigned_staff_id=request.form.get('assigned_staff_id')
+        trek.assigned_staff_id=int(trek.assigned_staff_id) if trek.assigned_staff_id else None
+        db.session.commit()
+        flash("Trek Changes have been made")
+        return redirect(url_for("main.all_treks"))
+    staff_list=User.query.filter_by(role='staff',is_approved=True).all()
+    return render_template("modify_trek.html",trek=trek,staff_list=staff_list)
+
 @main.route('/staff_dashboard')
 @login_as_staff
 def staff_dashboard():

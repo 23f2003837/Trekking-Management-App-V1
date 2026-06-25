@@ -43,7 +43,7 @@
             <td class="text-teal-dark">{{ trek.assigned_staff.name if trek.assigned_staff else 'Not assigned'}}</td>
         <!-- <td class="text-teal-dark">{{ trek.description }}</td> -->
             <td class="text-teal-dark"><a href=#>View Details</a></td>
-            <td class="text-teal-dark"><a href=#>Modify</a></td>
+            <td class="text-teal-dark"><a href="{{ url_for("main.edit_trek",trek_id=trek.id) }}">Modify</a></td>
         </tr>
         {% else %}
         <tr>
