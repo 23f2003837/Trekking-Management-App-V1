@@ -193,6 +193,42 @@ def delete_trek(trek_id):
     flash('Trek Marked as Cancelled Successfully!')
     return redirect(url_for("main.all_treks"))
 
+#admin blacklist a user
+@main.route("/admin_dashboard/blacklist_trekker/<int:user_id>",methods=['POST'])
+@login_as_admin
+def blacklist_trekker(user_id):
+    user=User.query.get_or_404(user_id)
+    user.is_blacklisted=not user.is_blacklisted
+    db.session.commit()
+    status="Blacklisted" if user.is_blacklisted else "Removed from blacklist"
+    flash(f"{status} successfully")
+    if status=='Blacklisted':
+        return redirect(url_for("main.all_trekkers"))
+    else:
+        return redirect(url_for("main.blacklisted_trekkers"))
+
+#admin view all blacklisted users
+@main.route("/admin_dashboard/blacklisted_trekkers")
+@login_as_admin
+def blacklisted_trekkers():
+    search = request.args.get('search', '')
+    query=User.query.filter(User.role=='trekker').filter(User.is_blacklisted==True)
+    if search:
+        query=query.filter(User.name.ilike(f'%{search}%'))
+    blacklisted_trekker_list=query.all()
+    return render_template("blacklisted_trekkers.html",blacklisted_trekker_list=blacklisted_trekker_list)
+
+#admin view trekkers list
+@main.route("/admin_dashboard/all_trekkers")
+@login_as_admin
+def all_trekkers():
+    search=request.args.get('search','')
+    query=User.query.filter(User.role=='trekker').filter(User.is_blacklisted==False)
+    if search:
+        query=query.filter(User.name.ilike(f'%{search}%'))
+    trekker_list=query.all()
+    return render_template("all_trekkers.html",trekker_list=trekker_list)
+
 @main.route('/staff_dashboard')
 @login_as_staff
 def staff_dashboard():
