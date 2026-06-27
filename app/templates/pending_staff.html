@@ -18,6 +18,7 @@
             <th class="text-teal-dark">Staff Name</th>
             <th class="text-teal-dark">Email</th>
             <th class="text-teal-dark">Approve</th>
+            <th class="text-teal-dark">Reject</th>
         </tr>
     </thead>
     <tbody>
@@ -34,10 +35,18 @@
                     <button type="submit" class="btn btn-link text-success p-0 m-0" style="text-decoration:none;">✔️</button>
                 </form>
             </td>
+            <td class="text-teal-dark">
+                <form action="{{ url_for("main.reject_staff",user_id=user.id) }}" 
+                    method="POST" 
+                    style="display:inline;"
+                    onsubmit="return confirm('Are you sure you want to reject this staff?');">
+                    <button type="submit" class="btn btn-link text-success p-0 m-0" style="text-decoration:none;">🗙</button>
+                </form>
+            </td>
         </tr>
         {% else %}
         <tr>
-            <td colspan="4" class="text-center text-teal-dark">No Pending Staff yet!</td>
+            <td colspan="5" class="text-center text-teal-dark">No Pending Staff yet!</td>
         </tr>
         {% endfor %}
     </tbody>

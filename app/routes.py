@@ -251,7 +251,7 @@ def all_trekkers():
 @login_as_admin
 def all_staffs():
     search=request.args.get('search','')
-    query=User.query.filter_by(role='staff', is_blacklisted=False)
+    query=User.query.filter_by(role='staff',is_blacklisted=False,is_approved=True)
     if search:
         query=query.filter(User.name.ilike(f"%{search}%"))
     staff_list=query.all()
@@ -303,6 +303,20 @@ def approve_staff(user_id):
     flash("Staff approved successfully")
     return redirect(url_for("main.pending_staff_list"))
 
+#admin rejects staff
+@main.route("/admin_dashboard/reject_staff/<int:user_id>",methods=['POST'])
+@login_as_admin
+def reject_staff(user_id):
+    user=User.query.get_or_404(user_id)
+    if user.role=='staff' and user.is_approved==False:
+        db.session.delete(user)
+        db.session.commit()
+        flash("Staff application rejected and removed.")
+        return redirect(url_for("main.pending_staff_list"))
+    else:
+        flash("This user is not a pending staff applicant.")
+        return redirect(url_for("main.pending_staff_list"))
+    
 #admin can view per user trekking history
 @main.route("/admin_dashboard/trekker_history/<int:user_id>")
 @login_as_admin
