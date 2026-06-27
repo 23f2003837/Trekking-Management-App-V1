@@ -85,14 +85,15 @@ def logout():
 def admin_dashboard():
     total_treks=Trek.query.filter(Trek.status!="cancelled").count()
     total_users=User.query.filter_by(role='trekker',is_blacklisted=False).count()
-    total_bookings=Booking.query.count()
+    total_bookings=Booking.query.filter(Booking.status!='cancelled').count()
     total_staff=User.query.filter_by(role='staff',is_blacklisted=False,is_approved=True).count()
     recent_bookings=Booking.query.order_by(Booking.booking_date.desc()).limit(5).all()
     # Filter cancelled out, then order by start_date descending
-    recent_treks = Trek.query.filter(Trek.status!='cancelled').order_by(Trek.start_date.desc()).limit(5).all()
+    recent_treks=Trek.query.filter(Trek.status!='cancelled').order_by(Trek.start_date.desc()).limit(5).all()
+    recent_pending_staff=User.query.filter_by(role='staff',is_approved=False).limit(5).all()
     return render_template("admin_dashboard.html",total_treks=total_treks,total_users=total_users,
                            total_bookings=total_bookings,total_staff=total_staff,recent_bookings=recent_bookings
-                           ,recent_treks=recent_treks)
+                           ,recent_treks=recent_treks,recent_pending_staff=recent_pending_staff)
 
 #admin sees all bookings
 @main.route("/admin_dashboard/all_bookings")
@@ -240,7 +241,7 @@ def all_staffs():
     staff_list=query.all()
     return render_template("all_staff.html",staff_list=staff_list)
 
-#admin blacklist a user
+#admin blacklist a staff
 @main.route("/admin_dashboard/blacklist_staff/<int:user_id>",methods=['POST'])
 @login_as_admin
 def blacklist_staff(user_id):
@@ -264,6 +265,27 @@ def blacklisted_staff_list():
         query=query.filter(User.name.ilike(f"%{search}%"))
     blacklisted_staff_list=query.all()
     return render_template("blacklisted_staff.html",blacklisted_staff_list=blacklisted_staff_list)
+
+#admin can view all pending staff
+@main.route("/admin_dashboard/pending_staff")
+@login_as_admin
+def pending_staff_list():
+    query=User.query.filter_by(role='staff',is_approved=False)
+    search=request.args.get('search','')
+    if search:
+        query=query.filter(User.name.ilike(f"%{search}%"))
+    pending_staff_list=query.all()
+    return render_template("pending_staff.html",pending_staff_list=pending_staff_list)
+
+#admin approves pending staff
+@main.route("/admin_dashboard/approve_staff/<int:user_id>",methods=['POST'])
+@login_as_admin
+def approve_staff(user_id):
+    user=User.query.get_or_404(user_id)
+    user.is_approved=True
+    db.session.commit()
+    flash("Staff approved successfully")
+    return redirect(url_for("main.pending_staff_list"))
 
 @main.route('/staff_dashboard')
 @login_as_staff
