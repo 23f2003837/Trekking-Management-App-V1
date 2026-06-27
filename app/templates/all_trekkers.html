@@ -34,6 +34,9 @@
                     <button type="submit" class="btn btn-link text-danger p-0 m-0" style="text-decoration:none;">🗙</button>
                 </form>
             </td>
+            <td class="text-teal-dark">
+                <a href="{{ url_for('main.trekker_history', user_id=user.id) }}">History</a>
+            </td>
         </tr>
         {% else %}
         <tr>

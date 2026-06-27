@@ -17,7 +17,7 @@
             <th class="text-teal-dark">Staff Id</th>
             <th class="text-teal-dark">Staff Name</th>
             <th class="text-teal-dark">Email</th>
-            <th class="text-teal-dark">Approved</th>
+            <th class="text-teal-dark">View History</th>
             <th class="text-teal-dark">Blacklist</th>
         </tr>
     </thead>
@@ -27,7 +27,7 @@
             <td class="text-teal-dark">{{ user.id }}</td>
             <td class="text-teal-dark">{{ user.name }}</td>
             <td class="text-teal-dark">{{ user.email }}</td>
-            <td class="text-teal-dark">{{ user.is_approved }}</td>
+            <td><a class="text-teal-dark" href="{{ url_for('main.staff_history', user_id=user.id) }}">History</a></td>
             <td class="text-teal-dark">
                 <form action="{{ url_for("main.blacklist_staff",user_id=user.id) }}" 
                     method="POST" 

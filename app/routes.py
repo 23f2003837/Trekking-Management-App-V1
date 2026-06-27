@@ -87,7 +87,7 @@ def admin_dashboard():
     total_users=User.query.filter_by(role='trekker',is_blacklisted=False).count()
     total_bookings=Booking.query.filter(Booking.status!='cancelled').count()
     total_staff=User.query.filter_by(role='staff',is_blacklisted=False,is_approved=True).count()
-    recent_bookings=Booking.query.order_by(Booking.booking_date.desc()).limit(5).all()
+    recent_bookings=Booking.query.filter(Booking.status!='cancelled').order_by(Booking.booking_date.desc()).limit(5).all()
     # Filter cancelled out, then order by start_date descending
     recent_treks=Trek.query.filter(Trek.status!='cancelled').order_by(Trek.start_date.desc()).limit(5).all()
     recent_pending_staff=User.query.filter_by(role='staff',is_approved=False).limit(5).all()
@@ -286,6 +286,29 @@ def approve_staff(user_id):
     db.session.commit()
     flash("Staff approved successfully")
     return redirect(url_for("main.pending_staff_list"))
+
+#admin can view per user trekking history
+@main.route("/admin_dashboard/trekker_history/<int:user_id>")
+@login_as_admin
+def trekker_history(user_id):
+    user=User.query.get_or_404(user_id)
+    # All bookings for this user, completed treks
+    history=Booking.query.join(Trek).filter(Booking.user_id==user_id,
+            Trek.status=='completed').order_by(Trek.end_date.desc()).all()
+    return render_template("trekker_history.html",user=user,history=history)
+
+#admin can view staff trekking history where they have guided
+@main.route("/admin_dashboard/staff_history/<int:user_id>")
+@login_as_admin
+def staff_history(user_id):
+    user=User.query.get_or_404(user_id)
+    # Treks where this staff was assigned and completed
+    guided_treks = Trek.query.filter(
+        Trek.assigned_staff_id == user_id,
+        Trek.status.in_(['completed', 'ongoing', 'closed'])
+    ).order_by(Trek.start_date.desc()).all()
+    return render_template("staff_history.html", user=user, guided_treks=guided_treks)
+
 
 @main.route('/staff_dashboard')
 @login_as_staff
