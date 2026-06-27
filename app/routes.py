@@ -99,8 +99,23 @@ def admin_dashboard():
 @main.route("/admin_dashboard/all_bookings")
 @login_as_admin
 def all_bookings():
-    all_bookings=Booking.query.all()
+    search=request.args.get('search','')
+    query=Booking.query.join(User).filter(Booking.status!='cancelled')
+    if search:
+        query=query.filter(User.name.ilike(f'%{search}%'))
+    all_bookings=query.all()
     return render_template("all_bookings.html",all_bookings=all_bookings)
+    
+#admin sees all cancelled bookings
+@main.route("/admin_dashboard/cancelled_bookings")
+@login_as_admin
+def cancelled_bookings():
+    search=request.args.get('search', '')
+    query=Booking.query.join(User).filter(Booking.status=='cancelled')
+    if search:
+        query=query.filter(User.name.ilike(f'%{search}%'))
+    cancelled_bookings=query.all()
+    return render_template("cancelled_bookings.html",cancelled_bookings=cancelled_bookings)
 
 #admin sees all treks
 @main.route("/admin_dashboard/all_treks")
@@ -113,12 +128,13 @@ def all_treks():
     all_treks=query.all()
     return render_template("all_treks.html",all_treks=all_treks)
 
-#admin sees cancelled treks
+#admin sees all cancelled treks
 @main.route('/admin_dashboard/cancelled_treks')
 @login_as_admin
 def cancelled_treks():
+    search=request.args.get('search', '')
     cancelled_treks=Trek.query.filter_by(status='cancelled').all()
-    return render_template("cancelled_treks.html", cancelled_treks=cancelled_treks)
+    return render_template("cancelled_treks.html",cancelled_treks=cancelled_treks)
 
 #admin creates trek
 @main.route('/admin_dashboard/create_trek',methods=['GET','POST'])
