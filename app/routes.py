@@ -79,6 +79,7 @@ def logout():
     flash("You have been logged out successfully")
     return redirect(url_for("main.home"))
 
+#admin dashboard
 @main.route('/admin_dashboard')
 @login_as_admin
 def admin_dashboard():
@@ -87,24 +88,38 @@ def admin_dashboard():
     total_bookings=Booking.query.count()
     total_staff=User.query.filter_by(role='staff').count()
     recent_bookings=Booking.query.order_by(Booking.booking_date.desc()).limit(5).all()
-    recent_treks=Trek.query.order_by(Trek.start_date.desc()).limit(5).all()
+    # Filter cancelled out, then order by start_date descending
+    recent_treks = Trek.query.filter(Trek.status != 'cancelled').order_by(Trek.start_date.desc()).limit(5).all()
     return render_template("admin_dashboard.html",total_treks=total_treks,total_users=total_users,
                            total_bookings=total_bookings,total_staff=total_staff,recent_bookings=recent_bookings
                            ,recent_treks=recent_treks)
+
+#admin sees all bookings
 @main.route("/admin_dashboard/all_bookings")
 @login_as_admin
 def all_bookings():
     all_bookings=Booking.query.all()
     return render_template("all_bookings.html",all_bookings=all_bookings)
+
+#admin sees all treks
 @main.route("/admin_dashboard/all_treks")
 @login_as_admin
 def all_treks():
     search=request.args.get('search','')
+    query=Trek.query.filter(Trek.status!='cancelled')
     if search:
-        all_treks=Trek.query.filter(Trek.name.ilike(f'%{search}%')).all()
-    else:
-        all_treks=Trek.query.all()
+        query=query.filter(Trek.name.ilike(f'%{search}%'))
+    all_treks=query.all()
     return render_template("all_treks.html",all_treks=all_treks)
+
+#admin sees cancelled treks
+@main.route('/admin_dashboard/cancelled_treks')
+@login_as_admin
+def cancelled_treks():
+    cancelled_treks=Trek.query.filter_by(status='cancelled').all()
+    return render_template("cancelled_treks.html", cancelled_treks=cancelled_treks)
+
+#admin creates trek
 @main.route('/admin_dashboard/create_trek',methods=['GET','POST'])
 @login_as_admin
 def create_trek():
@@ -130,6 +145,7 @@ def create_trek():
     staff_list=User.query.filter_by(role='staff',is_approved=True).all()
     return render_template('create_trek.html',staff_list=staff_list) #get to create trek form 
 
+#admin edits trek
 @main.route('/admin_dashboard/edit_trek/<int:trek_id>',methods=['GET','POST'])
 @login_as_admin
 def edit_trek(trek_id):
@@ -153,6 +169,29 @@ def edit_trek(trek_id):
         return redirect(url_for("main.all_treks"))
     staff_list=User.query.filter_by(role='staff',is_approved=True).all()
     return render_template("modify_trek.html",trek=trek,staff_list=staff_list)
+
+#admin deletes a trek
+@main.route('/admin_dashboard/delete_trek/<int:trek_id>',methods=['POST'])
+@login_as_admin
+def delete_trek(trek_id):
+    trek=Trek.query.get_or_404(trek_id)
+    #all treks that have bookings as well as were completed or ongoing
+    if trek.bookings and trek.status in ['completed','ongoing']:
+        flash("Cannot delete treks that are completed or ongoing!")
+        return redirect(url_for("main.all_treks"))
+    #if trek had bookings but status is pending/open/closed then cancel trek
+    if trek.bookings:
+        for booking in trek.bookings:
+            booking.status='cancelled'
+        trek.status='cancelled'
+        db.session.commit()
+        flash("Trek had existing Bookings. All Bookings cancelled and trek marked as Cancelled.")
+        return redirect(url_for("main.all_treks"))
+    #if trek has no bookings
+    trek.status='cancelled'
+    db.session.commit()
+    flash('Trek Marked as Cancelled Successfully!')
+    return redirect(url_for("main.all_treks"))
 
 @main.route('/staff_dashboard')
 @login_as_staff

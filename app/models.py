@@ -32,7 +32,13 @@ class Trek(db.Model):
     total_slots=db.Column(db.Integer,nullable=True)
     start_date=db.Column(db.DateTime,nullable=False)
     end_date=db.Column(db.DateTime,nullable=False)
-    status=db.Column(db.String(20),nullable=False,default='pending')#pending,approved,open,closed,completed,ongoing
+    status=db.Column(db.String(20),nullable=False,default='pending')
+#pending:created by admin, not yet visible/bookable by trekkers
+#open:bookable by trekkers
+#closed:all slots filled, not yet started
+#ongoing:trek has started, not finished, not bookable
+#completed:trek has ended, historical record
+#cancelled:trek was removed by admin after bookings existed, preserved for trekker history
     assigned_staff_id=db.Column(db.Integer,db.ForeignKey("user.id"),nullable=True)
     description=db.Column(db.String(1000),nullable=True)
     

@@ -37,13 +37,16 @@
     </style>
 </head>
 <body>
+
+    
     <nav class="navbar navbar-dark bg-teal-dark px-3">
         <a class="navbar-brand text-offwhite" href="{{ url_for("main.home") }}">TrekManager</a>
         
         {% if not session.user_id%}
             <!-- show register,login stuff -->
             <div>
-                <a class="nav-link text-offwhite d-inline" href="{{ url_for("main.login") }}">Login  ||  </a>
+                <a class="nav-link text-offwhite d-inline" href="{{ url_for("main.login") }}">Login</a>
+                <span class="text-offwhite mx-2">|</span>
                 <a class="nav-link text-offwhite d-inline" href="{{ url_for("main.register") }}">Register</a>
             </div>
         {% else %}
