@@ -38,7 +38,7 @@ class Trek(db.Model):
 #closed:all slots filled, not yet started
 #ongoing:trek has started, not finished, not bookable
 #completed:trek has ended, historical record
-#cancelled:trek was removed by admin after bookings existed, preserved for trekker history
+#cancelled:trek was removed by admin
     assigned_staff_id=db.Column(db.Integer,db.ForeignKey("user.id"),nullable=True)
     description=db.Column(db.String(1000),nullable=True)
     

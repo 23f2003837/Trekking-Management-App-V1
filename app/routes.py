@@ -11,6 +11,7 @@ main=Blueprint('main',__name__)
 def home():
     return render_template('home.html')
 
+#login and go to their respective dashboard
 @main.route("/login",methods=['GET','POST'])
 def login():
     if request.method=="POST":
@@ -43,6 +44,7 @@ def login():
         return redirect(url_for("main.register"))
     return render_template("login.html")
 
+#register
 @main.route("/register",methods=['GET','POST'])
 def register():
     if request.method=='POST':
@@ -73,6 +75,7 @@ def register():
         return redirect(url_for("main.login"))
     return render_template('register.html')
 
+#logout
 @main.route('/logout')
 def logout():
     session.clear()
@@ -210,7 +213,7 @@ def delete_trek(trek_id):
     flash('Trek Marked as Cancelled Successfully!')
     return redirect(url_for("main.all_treks"))
 
-#admin blacklist a user
+#admin blacklist a user/trekker
 @main.route("/admin_dashboard/blacklist_trekker/<int:user_id>",methods=['POST'])
 @login_as_admin
 def blacklist_trekker(user_id):
@@ -246,7 +249,7 @@ def all_trekkers():
     trekker_list=query.all()
     return render_template("all_trekkers.html",trekker_list=trekker_list)
 
-#admin can view staff
+#admin view staff list
 @main.route("/admin_dashboard/all_staff")
 @login_as_admin
 def all_staffs():
@@ -271,7 +274,7 @@ def blacklist_staff(user_id):
     else:
         return redirect(url_for("main.blacklisted_staff_list"))
 
-#admin can view all blacklisted staff
+#admin view all blacklisted staff
 @main.route("/admin_dashboard/blacklisted_staff")
 @login_as_admin
 def blacklisted_staff_list():
@@ -282,7 +285,7 @@ def blacklisted_staff_list():
     blacklisted_staff_list=query.all()
     return render_template("blacklisted_staff.html",blacklisted_staff_list=blacklisted_staff_list)
 
-#admin can view all pending staff
+#admin view all pending staff
 @main.route("/admin_dashboard/pending_staff")
 @login_as_admin
 def pending_staff_list():
@@ -303,7 +306,7 @@ def approve_staff(user_id):
     flash("Staff approved successfully")
     return redirect(url_for("main.pending_staff_list"))
 
-#admin rejects staff
+#admin rejects pending staff
 @main.route("/admin_dashboard/reject_staff/<int:user_id>",methods=['POST'])
 @login_as_admin
 def reject_staff(user_id):
@@ -327,23 +330,33 @@ def trekker_history(user_id):
             Trek.status=='completed').order_by(Trek.end_date.desc()).all()
     return render_template("trekker_history.html",user=user,history=history)
 
-#admin can view staff trekking history where they have guided
+#admin can view per staff trekking history where they have guided
 @main.route("/admin_dashboard/staff_history/<int:user_id>")
 @login_as_admin
 def staff_history(user_id):
     user=User.query.get_or_404(user_id)
     # Treks where this staff was assigned and completed
-    guided_treks = Trek.query.filter(
-        Trek.assigned_staff_id == user_id,
-        Trek.status.in_(['completed', 'ongoing', 'closed'])
+    guided_treks=Trek.query.filter(
+        Trek.assigned_staff_id==user_id,
+        Trek.status.in_(['completed','ongoing','closed'])
     ).order_by(Trek.start_date.desc()).all()
-    return render_template("staff_history.html", user=user, guided_treks=guided_treks)
+    return render_template("staff_history.html",user=user,guided_treks=guided_treks)
 
-
+#staff dashboard
 @main.route('/staff_dashboard')
 @login_as_staff
 def staff_dashboard():
-    return render_template("staff_dashboard.html")
+    staff_id=session['user_id']
+    total_assigned_treks=Trek.query.filter(Trek.assigned_staff_id==staff_id,Trek.status!='cancelled').count()
+    completed_treks=Trek.query.filter(Trek.assigned_staff_id==staff_id,Trek.status=='completed').count()
+    active_treks=Trek.query.filter(Trek.assigned_staff_id==staff_id,Trek.status.in_(['open','closed','ongoing'])).count()
+    return render_template("staff_dashboard.html",total_assigned_treks=total_assigned_treks,
+                           completed_treks=completed_treks,active_treks=active_treks)
+
+
+
+
+
 
 @main.route('/trekker_dashboard')
 @login_as_trekker
