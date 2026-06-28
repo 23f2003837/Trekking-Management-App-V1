@@ -350,13 +350,37 @@ def staff_dashboard():
     total_assigned_treks=Trek.query.filter(Trek.assigned_staff_id==staff_id,Trek.status!='cancelled').count()
     completed_treks=Trek.query.filter(Trek.assigned_staff_id==staff_id,Trek.status=='completed').count()
     active_treks=Trek.query.filter(Trek.assigned_staff_id==staff_id,Trek.status.in_(['open','closed','ongoing'])).count()
+    total_participants=Booking.query.join(Trek).filter(Trek.assigned_staff_id==staff_id,Booking.status!="cancelled").count()
+    guide_name=User.query.filter(User.id==staff_id).first().name
     return render_template("staff_dashboard.html",total_assigned_treks=total_assigned_treks,
-                           completed_treks=completed_treks,active_treks=active_treks)
+                           completed_treks=completed_treks,active_treks=active_treks,total_participants=total_participants
+                           ,guide_name=guide_name)
 
+#staff can update their profile
+@main.route("/staff_dashboard/update_staff_profile", methods=['GET', 'POST'])
+@login_as_staff
+def update_staff_profile():
+    user_id=session['user_id']
+    user=User.query.get_or_404(user_id)
+    user_profile = StaffProfile.query.filter_by(user_id=user_id).first()
+    if request.method=='POST':
+        if not user_profile:
+            user_profile=StaffProfile(user_id=user_id)
+            db.session.add(user_profile)
+        user_profile.contact=request.form.get('contact')
+        user_profile.experience=request.form.get("experience")
+        user_profile.bio=request.form.get("bio")
+        db.session.commit()
+        flash("Profile has been Updated")
+        return redirect(url_for("main.update_staff_profile"))
+    
+    return render_template("update_staff_profile.html",user=user,user_profile=user_profile)
 
-
-
-
+#staff can access their treks only
+@main.route("/staff_dashboard/all_assigned_treks")
+@login_as_staff
+def all_assigned_treks():
+    pass
 
 @main.route('/trekker_dashboard')
 @login_as_trekker
