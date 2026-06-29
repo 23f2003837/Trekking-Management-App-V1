@@ -4,7 +4,6 @@
 <div class="mb-4">
     <div class="d-flex justify-content-between align-items-center p-3">
         <h3 class="text-teal-dark m-0">Hello, Guide {{ guide_name }}</h3>
-        <a href="{{ url_for('main.update_staff_profile') }}" class="btn bg-sage text-teal-dark btn-sm me-2"><strong>Update Profile</strong></a>
     </div>
     <p class="text-teal-muted mb-0">Welcome back to TrekManager. Here's what's happening today.</p>
 </div>
@@ -45,9 +44,32 @@
     </div>
 </div>
 
-
+<!-- Quick Actions for Staff -->
+<div class="row mt-4 mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body bg-ice rounded">
+                <h5 class="card-title text-teal-dark">📋 My Assigned Treks</h5>
+                <p class="card-text text-teal-dark small">Manage your treks, update slots, or view participants</p>
+                <a href="{{ url_for("main.all_assigned_treks") }}" class="btn bg-teal-dark text-offwhite btn-sm">View My Treks</a>
+                <a href="{{ url_for('main.staffs_cancelled_treks') }}" class="btn text-teal-dark bg-offwhite btn-sm">View Cancelled</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body bg-ice rounded">
+                <h5 class="card-title text-teal-dark">👤 My Profile</h5>
+                <p class="card-text text-teal-dark small">Update your contact details and experience</p>
+                <a href="{{ url_for('main.update_staff_profile') }}" class="btn bg-teal-dark text-offwhite btn-sm">Edit Profile</a>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="d-flex justify-content-between align-items-center p-3">
-    <h5 class="text-teal-dark m-0">All Assigned Treks</h5>
+    <h5 class="text-teal-dark m-0">All Active Treks</h5>
+    <a class="text-teal-muted" href="{{ url_for('main.all_assigned_treks') }}">View All Assigned Treks →</a>
 </div>
 
 <form method="GET" class="mb-3">
@@ -72,7 +94,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for trek in all_assigned_treks %}
+        {% for trek in all_active_treks %}
         <tr>
             <td class="text-teal-dark">{{ trek.id }}</td>
             <td class="text-teal-dark">{{ trek.name }}</td>

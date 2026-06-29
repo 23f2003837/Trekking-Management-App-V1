@@ -342,7 +342,7 @@ def staff_history(user_id):
     ).order_by(Trek.start_date.desc()).all()
     return render_template("staff_history.html",user=user,guided_treks=guided_treks)
 
-#staff dashboard and staff can see all assigned treks
+#staff dashboard and staff can see all ongoing treks
 @main.route('/staff_dashboard')
 @login_as_staff
 def staff_dashboard():
@@ -354,13 +354,25 @@ def staff_dashboard():
     guide_name=User.query.get(staff_id).name
 
     search=request.args.get('search', '')
+    query=Trek.query.filter(Trek.assigned_staff_id==staff_id,Trek.status.in_(['open','closed','ongoing']))
+    if search:
+        query=query.filter(Trek.name.ilike(f'%{search}%'))
+    all_active_treks=query.all()
+    return render_template("staff_dashboard.html",total_assigned_treks=total_assigned_treks,
+                           completed_treks=completed_treks,active_treks=active_treks,total_participants=total_participants
+                           ,guide_name=guide_name,all_active_treks=all_active_treks)
+
+#staff can see all assigned treks
+@main.route('/staff_dashboard/all_assigned_treks')
+@login_as_staff
+def all_assigned_treks():
+    staff_id=session['user_id']
+    search=request.args.get('search', '')
     query=Trek.query.filter(Trek.assigned_staff_id==staff_id,Trek.status!='cancelled')
     if search:
         query=query.filter(Trek.name.ilike(f'%{search}%'))
     all_assigned_treks=query.all()
-    return render_template("staff_dashboard.html",total_assigned_treks=total_assigned_treks,
-                           completed_treks=completed_treks,active_treks=active_treks,total_participants=total_participants
-                           ,guide_name=guide_name,all_assigned_treks=all_assigned_treks)
+    return render_template("all_assigned_treks(staff).html",all_assigned_treks=all_assigned_treks)
 
 #staff can update their profile
 @main.route("/staff_dashboard/update_staff_profile", methods=['GET','POST'])
@@ -467,22 +479,6 @@ def staff_trek_participants(trek_id):
     bookings=Booking.query.filter_by(trek_id=trek.id).filter(Booking.status!='cancelled').all()
     cancelled_bookings=Booking.query.filter_by(trek_id=trek.id).filter(Booking.status=='cancelled').all()
     return render_template("staff_trek_participants.html",trek=trek,bookings=bookings,cancelled_bookings=cancelled_bookings)
-
-@main.route("/staff_dashboard/mark_attendance/<int:booking_id>/<status>",methods=['POST'])
-@login_as_staff
-def mark_attendance(booking_id,status):
-    staff_id=session['user_id']
-    booking=Booking.query.get_or_404(booking_id)  
-    if booking.trek.assigned_staff_id!=staff_id:
-        flash("Unauthorized access.")
-        return redirect(url_for("main.staff_dashboard"))
-    if status not in ['completed','no_show']:
-        flash("Invalid attendance status.")
-        return redirect(url_for("main.staff_trek_participants", trek_id=booking.trek_id))
-    booking.status=status
-    db.session.commit()
-    flash(f"Marked as {status}.")
-    return redirect(url_for("main.staff_trek_participants", trek_id=booking.trek_id))
 
 @main.route('/trekker_dashboard')
 @login_as_trekker
