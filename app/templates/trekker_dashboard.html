@@ -7,7 +7,7 @@
 
 <div class="d-flex justify-content-between align-items-center p-3">
     <h5 class="text-teal-dark m-0">Upcoming Treks</h5>
-    <a class="text-teal-muted me-4" href="{{ url_for('main.browse_trek') }}">Browse All Treks</a>
+    <a class="text-teal-muted me-4" href="{{ url_for("main.browse_trek") }}">Browse All Treks</a>
 </div>
 <div class="table-responsive" >
 <table class="table table-hover table-sm">
@@ -54,5 +54,43 @@
         {% endfor %}
     </tbody>
 </table>
+
+<!-- recent bookings -->
+ <div class="d-flex justify-content-between align-items-center p-3">
+    <h5 class="text-teal-dark m-0">Recent Booked Treks</h5>
+    <a class="text-teal-muted me-4" href="{{ url_for("main.booking_history") }}">All Bookings</a>
+</div>
+<div class="table-responsive" >
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th class="text-teal-dark">Booking Id</th>
+            <th class="text-teal-dark">Booking Date</th>
+            <th class="text-teal-dark">Trek Id</th>
+            <th class="text-teal-dark">Trek Name</th>
+            <th class="text-teal-dark">Location</th>
+            <th class="text-teal-dark">Start Date</th>
+            <th class="text-teal-dark">End Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for booking in my_recent_treks %}
+        <tr>
+            <td class="text-teal-dark">{{ booking.id }}</td>
+            <td class="text-teal-dark">{{ booking.booking_date.strftime('%d %b %Y') }}</td>
+            <td class="text-teal-dark">{{ booking.trek.id }}</td>
+            <td class="text-teal-dark">{{ booking.trek.name }}</td>
+            <td class="text-teal-dark">{{ booking.trek.location }}</td>
+            <td class="text-teal-dark">{{ booking.trek.start_date.strftime('%d %b %Y') }}</td>
+            <td class="text-teal-dark">{{ booking.trek.end_date.strftime('%d %b %Y') }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="7" class="text-center text-teal-dark">No Treks Booked yet!</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
 </div>
 {% endblock %}

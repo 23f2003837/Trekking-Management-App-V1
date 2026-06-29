@@ -487,7 +487,8 @@ def trekker_dashboard():
     user_id=session['user_id']
     user=User.query.get_or_404(user_id)
     browse_treks=Trek.query.filter(Trek.status=='open',Trek.assigned_staff_id!=None).order_by(Trek.start_date.asc()).limit(5).all()
-    return render_template("trekker_dashboard.html",user=user,browse_treks=browse_treks)
+    my_recent_treks=Booking.query.filter(Booking.user_id==user_id,Booking.status=="booked").order_by(Booking.booking_date.desc()).limit(5).all()
+    return render_template("trekker_dashboard.html",user=user,browse_treks=browse_treks,my_recent_treks=my_recent_treks)
 
 #trekker can browse trek
 @main.route("/trekker_dashboard/browse_trek")
@@ -500,7 +501,6 @@ def browse_trek():
         query = query.filter(Trek.name.ilike(f'%{search}%'))
     browse_treks=query.all()
     return render_template("trekker_browse_trek.html",browse_treks=browse_treks)
-
 
 #trekker can book treks
 @main.route("/trekker_dashboard/book_trek/<int:trek_id>",methods=['POST'])
@@ -525,4 +525,30 @@ def book_trek(trek_id):
     flash("Trek booked successfully!")
     return redirect(url_for("main.trekker_dashboard"))
 
-#trekker cancels a trek
+#trekker cancels a trek booking
+@main.route("/trekker_dashboard/cancel_booking/<int:trek_id>",methods=['POST'])
+@login_as_trekker
+def cancel_booking(trek_id):
+    user_id=session['user_id']
+    trek=Trek.query.get_or_404(trek_id)
+    if trek.status in ["completed","ongoing"]:
+        flash("This trek has already started or is completed. You cannot cancel now.")
+        return redirect(url_for("main.browse_trek"))
+    booked=Booking.query.filter_by(trek_id=trek_id,user_id=user_id).filter(Booking.status=="booked").first()
+    if not booked:
+        flash("You can't cancel because you have'nt booked this Trek.")
+        return redirect(url_for("main.browse_trek"))
+    booked.status='cancelled'
+    trek.available_slots+=1
+    db.session.commit()
+    flash("Trek Cancelled successfully!")
+    return redirect(url_for("main.booking_history"))
+
+#trekker can view their booking history
+@main.route("/trekker_dashboard/booking_history")
+@login_as_trekker
+def booking_history():
+    user_id=session["user_id"]
+    query=Booking.query.filter(Booking.user_id==user_id).order_by(Booking.booking_date.desc())
+    booked_treks=query.all()
+    return render_template("trekker_my_bookings.html",booked_treks=booked_treks)
