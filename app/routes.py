@@ -381,6 +381,79 @@ def update_staff_profile():
         return redirect(url_for("main.update_staff_profile"))
     
     return render_template("update_staff_profile.html",user=user,user_profile=user_profile)
+
+#staff manages their trek
+@main.route("/staff_dashboard/manage_trek/<int:trek_id>", methods=['GET','POST'])
+@login_as_staff
+def staff_manage_trek(trek_id):
+    staff_id=session['user_id']
+    trek=Trek.query.get_or_404(trek_id)
+    if trek.assigned_staff_id!=staff_id:
+        flash("Unauthorized access to this trek.")
+        return redirect(url_for("main.staff_dashboard"))
+    if request.method=='POST':
+        booked_count=Booking.query.filter_by(trek_id=trek.id,status='booked').count()
+        if trek.status=="open":
+            new_slots=int(request.form.get('total_slots'))
+            if new_slots>=booked_count:
+                trek.total_slots=new_slots
+                trek.available_slots=trek.total_slots-booked_count
+                db.session.commit()
+                flash("Slots updated successfully.")
+                return redirect(url_for("main.staff_manage_trek",trek_id=trek_id))
+            else:
+                flash("New total slots cannot be less than already booked count.","danger")
+                return redirect(url_for("main.staff_manage_trek",trek_id=trek.id))
+        else:
+            flash("Trek Status is Not open, Can't Modify Total Slots")
+            return redirect(url_for("main.staff_manage_trek",trek_id=trek.id))
+    return render_template("staff_modified_treks.html",trek=trek)
+
+@main.route("/staff_dashboard/toggle_booking/<int:trek_id>",methods=['POST'])
+@login_as_staff
+def toggle_trek_booking(trek_id):
+    staff_id=session['user_id']
+    trek=Trek.query.get_or_404(trek_id)
+    if trek.assigned_staff_id!=staff_id:
+        flash("Unauthorized.")
+        return redirect(url_for("main.staff_dashboard"))
+    if trek.status=='open':
+        trek.status='closed'
+        flash("Bookings closed for this trek.")
+    elif trek.status=='closed':
+        trek.status='open'
+        flash("Bookings reopened for this trek.")
+    else:
+        flash(f"Cannot change booking status from '{trek.status}'.")
+    db.session.commit()
+    return redirect(url_for("main.staff_manage_trek",trek_id=trek.id))
+
+@main.route("/staff_dashboard/progress_trek/<int:trek_id>", methods=['POST'])
+@login_as_staff
+def progress_trek(trek_id):
+    staff_id=session['user_id']
+    trek=Trek.query.get_or_404(trek_id)
+    if trek.assigned_staff_id!=staff_id:
+        flash("Unauthorized.")
+        return redirect(url_for("main.staff_dashboard"))
+    if trek.status=='closed':
+        trek.status='ongoing'
+        flash("Trek marked as started.")
+    elif trek.status=='ongoing':
+        trek.status='completed'
+        flash("Trek marked as completed.")
+    else:
+        flash(f"Cannot progress trek from '{trek.status}' status.")    
+    db.session.commit()
+    return redirect(url_for("main.staff_manage_trek",trek_id=trek.id))
+
+#staff view its own cancelled treks
+@main.route("/staff_dashboard/all_cancelled_treks")
+@login_as_staff
+def staffs_cancelled_treks():
+    user_id=session['user_id']
+    all_cancelled_treks=Trek.query.filter(Trek.assigned_staff_id==user_id,Trek.status=='cancelled').all()
+    return render_template("staff_cancelled_treks.html",all_cancelled_treks=all_cancelled_treks)
     
 @main.route('/trekker_dashboard')
 @login_as_trekker
