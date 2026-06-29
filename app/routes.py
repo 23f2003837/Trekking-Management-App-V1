@@ -342,7 +342,7 @@ def staff_history(user_id):
     ).order_by(Trek.start_date.desc()).all()
     return render_template("staff_history.html",user=user,guided_treks=guided_treks)
 
-#staff dashboard
+#staff dashboard and staff can see all assigned treks
 @main.route('/staff_dashboard')
 @login_as_staff
 def staff_dashboard():
@@ -351,13 +351,19 @@ def staff_dashboard():
     completed_treks=Trek.query.filter(Trek.assigned_staff_id==staff_id,Trek.status=='completed').count()
     active_treks=Trek.query.filter(Trek.assigned_staff_id==staff_id,Trek.status.in_(['open','closed','ongoing'])).count()
     total_participants=Booking.query.join(Trek).filter(Trek.assigned_staff_id==staff_id,Booking.status!="cancelled").count()
-    guide_name=User.query.filter(User.id==staff_id).first().name
+    guide_name=User.query.get(staff_id).name
+
+    search=request.args.get('search', '')
+    query=Trek.query.filter(Trek.assigned_staff_id==staff_id,Trek.status!='cancelled')
+    if search:
+        query=query.filter(Trek.name.ilike(f'%{search}%'))
+    all_assigned_treks=query.all()
     return render_template("staff_dashboard.html",total_assigned_treks=total_assigned_treks,
                            completed_treks=completed_treks,active_treks=active_treks,total_participants=total_participants
-                           ,guide_name=guide_name)
+                           ,guide_name=guide_name,all_assigned_treks=all_assigned_treks)
 
 #staff can update their profile
-@main.route("/staff_dashboard/update_staff_profile", methods=['GET', 'POST'])
+@main.route("/staff_dashboard/update_staff_profile", methods=['GET','POST'])
 @login_as_staff
 def update_staff_profile():
     user_id=session['user_id']
@@ -375,13 +381,7 @@ def update_staff_profile():
         return redirect(url_for("main.update_staff_profile"))
     
     return render_template("update_staff_profile.html",user=user,user_profile=user_profile)
-
-#staff can access their treks only
-@main.route("/staff_dashboard/all_assigned_treks")
-@login_as_staff
-def all_assigned_treks():
-    pass
-
+    
 @main.route('/trekker_dashboard')
 @login_as_trekker
 def trekker_dashboard():
