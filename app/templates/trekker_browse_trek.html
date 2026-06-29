@@ -1,14 +1,15 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="mb-4">
-    <h3 class="text-teal-dark m-0">Hello {{ user.name }}</h3>
-    <p class="text-teal-muted mb-0">Welcome back to TrekManager. Here's what's happening today.</p>
+<div class="d-flex justify-content-between align-items-center p-3">
+    <h5 class="text-teal-dark m-0">Browse Treks</h5>
+    <div>
+        <a class="text-teal-muted" href="{{ url_for('main.trekker_dashboard') }}">← Back to Dashboard</a>
+    </div>
 </div>
 
-<div class="d-flex justify-content-between align-items-center p-3">
-    <h5 class="text-teal-dark m-0">Upcoming Treks</h5>
-    <a class="text-teal-muted me-4" href="{{ url_for('main.browse_trek') }}">Browse All Treks</a>
-</div>
+<form method="GET" class="mb-3">
+    <input type="text" name="search" placeholder="Search by Trek name.." class="form-control text-teal-muted bg-offwhite" value="{{ request.args.get('search','') }}">
+</form>
 <div class="table-responsive" >
 <table class="table table-hover table-sm">
     <thead>
@@ -39,10 +40,10 @@
             <td class="text-teal-dark">{{ trek.available_slots }}</td>
             <td class="text-teal-dark">{{ trek.assigned_staff.name if trek.assigned_staff else 'Not assigned'}}</td>
             <td class="text-teal-dark">{{ trek.total_slots-trek.available_slots }}</td>
-            <td><form action="{{ url_for('main.book_trek',trek_id=trek.id) }}" 
+            <td><form action="{{ url_for('main.book_trek', trek_id=trek.id) }}" 
                     method="POST" 
                     style="display:inline;"
-                    onsubmit="return confirm('Are you sure you want to book this trek?');">
+                    onsubmit="return confirm('Are you sure you want to Book this trek?');">
                     <button type="submit" class="btn bg-sage" style="text-decoration:none;">Book</button>
                 </form>
             </td>

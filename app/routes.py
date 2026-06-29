@@ -480,7 +480,22 @@ def staff_trek_participants(trek_id):
     cancelled_bookings=Booking.query.filter_by(trek_id=trek.id).filter(Booking.status=='cancelled').all()
     return render_template("staff_trek_participants.html",trek=trek,bookings=bookings,cancelled_bookings=cancelled_bookings)
 
+#trekker can view their dashboard
 @main.route('/trekker_dashboard')
 @login_as_trekker
 def trekker_dashboard():
-    return render_template("trekker_dashboard.html")
+    user_id=session['user_id']
+    user=User.query.get_or_404(user_id)
+    browse_treks=Trek.query.filter(Trek.status=='open',Trek.assigned_staff_id!=None).order_by(Trek.start_date.asc()).limit(5).all()
+    return render_template("trekker_dashboard.html",user=user,browse_treks=browse_treks)
+
+#trekker can book trek
+@main.route("/trekker_dashboard/browse_trek")
+@login_as_trekker
+def browse_trek():
+    query=Trek.query.filter(Trek.status=='open',Trek.assigned_staff_id!=None)
+    search = request.args.get('search', '')
+    if search:
+        query = query.filter(Trek.name.ilike(f'%{search}%'))
+    browse_treks=query.all()
+    return render_template("trekker_browse_trek.html",browse_treks=browse_treks)
