@@ -489,13 +489,40 @@ def trekker_dashboard():
     browse_treks=Trek.query.filter(Trek.status=='open',Trek.assigned_staff_id!=None).order_by(Trek.start_date.asc()).limit(5).all()
     return render_template("trekker_dashboard.html",user=user,browse_treks=browse_treks)
 
-#trekker can book trek
+#trekker can browse trek
 @main.route("/trekker_dashboard/browse_trek")
 @login_as_trekker
 def browse_trek():
+    user_id=session['user_id']
     query=Trek.query.filter(Trek.status=='open',Trek.assigned_staff_id!=None)
     search = request.args.get('search', '')
     if search:
         query = query.filter(Trek.name.ilike(f'%{search}%'))
     browse_treks=query.all()
     return render_template("trekker_browse_trek.html",browse_treks=browse_treks)
+
+
+#trekker can book treks
+@main.route("/trekker_dashboard/book_trek/<int:trek_id>",methods=['POST'])
+@login_as_trekker
+def book_trek(trek_id):
+    user_id=session['user_id']
+    trek=Trek.query.get_or_404(trek_id)
+    if trek.status!="open":
+        flash("This Trek is no longer open for Booking")
+        return redirect(url_for("main.browse_trek"))
+    if trek.available_slots<1:
+        flash("Sorry, This Trek has no slots left")
+        return redirect(url_for("main.browse_trek"))
+    existing=Booking.query.filter_by(trek_id=trek_id,user_id=user_id).filter(Booking.status!="cancelled").first()
+    if existing:
+        flash("You have already Booked this Trek!")
+        return redirect(url_for("main.browse_trek"))
+    booking=Booking(user_id=user_id,trek_id=trek_id,status='booked')
+    db.session.add(booking)
+    trek.available_slots-=1
+    db.session.commit()
+    flash("Trek booked successfully!")
+    return redirect(url_for("main.trekker_dashboard"))
+
+#trekker cancels a trek
