@@ -454,7 +454,36 @@ def staffs_cancelled_treks():
     user_id=session['user_id']
     all_cancelled_treks=Trek.query.filter(Trek.assigned_staff_id==user_id,Trek.status=='cancelled').all()
     return render_template("staff_cancelled_treks.html",all_cancelled_treks=all_cancelled_treks)
-    
+
+#staff view their respective participants
+@main.route("/staff_dashboard/trek_participants/<int:trek_id>")
+@login_as_staff
+def staff_trek_participants(trek_id):
+    staff_id=session['user_id']
+    trek=Trek.query.get_or_404(trek_id)
+    if trek.assigned_staff_id!=staff_id:
+        flash("Unauthorized access.")
+        return redirect(url_for("main.staff_dashboard"))
+    bookings=Booking.query.filter_by(trek_id=trek.id).filter(Booking.status!='cancelled').all()
+    cancelled_bookings=Booking.query.filter_by(trek_id=trek.id).filter(Booking.status=='cancelled').all()
+    return render_template("staff_trek_participants.html",trek=trek,bookings=bookings,cancelled_bookings=cancelled_bookings)
+
+@main.route("/staff_dashboard/mark_attendance/<int:booking_id>/<status>",methods=['POST'])
+@login_as_staff
+def mark_attendance(booking_id,status):
+    staff_id=session['user_id']
+    booking=Booking.query.get_or_404(booking_id)  
+    if booking.trek.assigned_staff_id!=staff_id:
+        flash("Unauthorized access.")
+        return redirect(url_for("main.staff_dashboard"))
+    if status not in ['completed','no_show']:
+        flash("Invalid attendance status.")
+        return redirect(url_for("main.staff_trek_participants", trek_id=booking.trek_id))
+    booking.status=status
+    db.session.commit()
+    flash(f"Marked as {status}.")
+    return redirect(url_for("main.staff_trek_participants", trek_id=booking.trek_id))
+
 @main.route('/trekker_dashboard')
 @login_as_trekker
 def trekker_dashboard():

@@ -12,7 +12,8 @@
 <form method="GET" class="mb-3">
     <input type="text" name="search" placeholder="Search by Trek name.." class="form-control text-teal-muted bg-offwhite" value="{{ request.args.get('search','') }}">
 </form>
-<table class="table">
+<div class="table-responsive" >
+<table class="table table-hover table-sm">
     <thead>
         <tr>
             <th class="text-teal-dark">Trek Id</th>
@@ -21,16 +22,13 @@
             <th class="text-teal-dark">Start Date</th>
             <th class="text-teal-dark">End Date</th>
             <th class="text-teal-dark">Duration</th>
-        <!-- <th class="text-teal-dark">Difficulty</th> -->
+            <th class="text-teal-dark">Difficulty</th>
             <th class="text-teal-dark">Trek Status</th>
             <th class="text-teal-dark">Available Slots</th>
             <th class="text-teal-dark">Total Slots</th>
             <th class="text-teal-dark">Assigned Guide</th>
-            <th class="text-teal-dark">Trek Details</th>
-            <th class="text-teal-dark">Modify</th>
-            <th class="text-teal-dark">Cancel</th>
-            
-        <!-- <th class="text-teal-dark">Trek Description</th> -->
+            <th class="text-teal-dark">Total Participants</th>
+            <th class="text-teal-dark">Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -42,15 +40,14 @@
             <td class="text-teal-dark">{{ trek.start_date.strftime('%d %b %Y') }}</td>
             <td class="text-teal-dark">{{ trek.end_date.strftime('%d %b %Y') }}</td>
             <td class="text-teal-dark">{{ trek.duration }}</td>
-        <!-- <td class="text-teal-dark">{{ trek.difficulty }}</td> -->
+            <td class="text-teal-dark">{{ trek.difficulty }}</td>
             <td class="text-teal-dark">{{ trek.status }}</td>
             <td class="text-teal-dark">{{ trek.available_slots }}</td>
             <td class="text-teal-dark">{{ trek.total_slots }}</td>
             <td class="text-teal-dark">{{ trek.assigned_staff.name if trek.assigned_staff else 'Not assigned'}}</td>
-        <!-- <td class="text-teal-dark">{{ trek.description }}</td> -->
-            <td><a class="text-teal-muted" href=#>View Details</a></td>
-            <td><a class="text-teal-muted" href="{{ url_for("main.edit_trek",trek_id=trek.id) }}">Modify</a></td>
-            <td class="text-teal-dark">
+            <td class="text-teal-dark">{{ trek.total_slots-trek.available_slots }}</td>
+            
+            <td><a class="text-teal-muted" href="{{ url_for("main.edit_trek",trek_id=trek.id) }}">✎</a>
                 <form action="{{ url_for('main.delete_trek', trek_id=trek.id) }}" 
                     method="POST" 
                     style="display:inline;"
@@ -66,5 +63,5 @@
         {% endfor %}
     </tbody>
 </table>
-
+</div>
 {% endblock %}
