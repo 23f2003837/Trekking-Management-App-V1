@@ -487,7 +487,12 @@ def staff_trek_participants(trek_id):
 def trekker_dashboard():
     user_id=session['user_id']
     user=User.query.get_or_404(user_id)
-    browse_treks=Trek.query.filter(Trek.status=='open',Trek.assigned_staff_id!=None).order_by(Trek.start_date.asc()).limit(5).all()
+    booked_ids=Booking.query.filter(Booking.user_id==user_id,Booking.status!='cancelled').all()
+    booked_ids=[b.trek_id for b in booked_ids]
+    query=Trek.query.filter(Trek.status=='open',Trek.assigned_staff_id!=None)
+    if booked_ids:
+        query=query.filter(~Trek.id.in_(booked_ids))
+    browse_treks=query.order_by(Trek.start_date.asc()).limit(5).all()
     my_recent_treks=Booking.query.filter(Booking.user_id==user_id,Booking.status=="booked").order_by(Booking.booking_date.desc()).limit(5).all()
     return render_template("trekker_dashboard.html",user=user,browse_treks=browse_treks,my_recent_treks=my_recent_treks)
 
@@ -496,11 +501,15 @@ def trekker_dashboard():
 @login_as_trekker
 def browse_trek():
     user_id=session['user_id']
+    booked_ids=Booking.query.filter(Booking.user_id==user_id,Booking.status!='cancelled').all()
+    booked_ids=[b.trek_id for b in booked_ids]
     query=Trek.query.filter(Trek.status=='open',Trek.assigned_staff_id!=None)
+    if booked_ids:
+        query=query.filter(~Trek.id.in_(booked_ids))
     search = request.args.get('search', '')
     if search:
         query = query.filter(Trek.name.ilike(f'%{search}%'))
-    browse_treks=query.all()
+    browse_treks=query.order_by(Trek.start_date.asc()).all()
     return render_template("trekker_browse_trek.html",browse_treks=browse_treks)
 
 #trekker can book treks
