@@ -14,15 +14,18 @@
 <table class="table table-hover">
     <thead>
         <tr>
+            <th class="text-teal-dark">#</th>
             <th class="text-teal-dark">Trekker Id</th>
             <th class="text-teal-dark">Trekker Name</th>
             <th class="text-teal-dark">Email</th>
             <th class="text-teal-dark">Blacklist</th>
+            <th class="text-teal-dark">Booking History</th>
         </tr>
     </thead>
     <tbody>
         {% for user in trekker_list %}
         <tr>
+            <td class="text-teal-dark">{{ loop.index }}</td>
             <td class="text-teal-dark">{{ user.id }}</td>
             <td class="text-teal-dark">{{ user.name }}</td>
             <td class="text-teal-dark">{{ user.email }}</td>
@@ -40,7 +43,7 @@
         </tr>
         {% else %}
         <tr>
-            <td colspan="4" class="text-center text-teal-dark">No Trekkers yet!</td>
+            <td colspan="6" class="text-center text-teal-dark">No Trekkers yet!</td>
         </tr>
         {% endfor %}
     </tbody>

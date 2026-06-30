@@ -16,6 +16,7 @@
 <table class="table table-hover table-sm">
     <thead>
         <tr>
+            <th class="text-teal-dark">#</th>
             <th class="text-teal-dark">Trek Id</th>
             <th class="text-teal-dark">Trek Name</th>
             <th class="text-teal-dark">Location</th>
@@ -34,6 +35,7 @@
     <tbody>
         {% for trek in all_treks %}
         <tr>
+            <td class="text-teal-dark">{{ loop.index }}</td>
             <td class="text-teal-dark">{{ trek.id }}</td>
             <td class="text-teal-dark">{{ trek.name }}</td>
             <td class="text-teal-dark">{{ trek.location }}</td>
@@ -58,7 +60,7 @@
         </tr>
         {% else %}
         <tr>
-            <td colspan="13" class="text-center text-teal-dark">No Treks yet!</td>
+            <td colspan="14" class="text-center text-teal-dark">No Treks yet!</td>
         </tr>
         {% endfor %}
     </tbody>

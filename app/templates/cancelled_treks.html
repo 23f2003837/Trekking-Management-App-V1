@@ -14,6 +14,7 @@
 <table class="table table-hover">
     <thead>
         <tr>
+            <th class="text-teal-dark">#</th>
             <th class="text-teal-dark">Trek Id</th>
             <th class="text-teal-dark">Trek Name</th>
             <th class="text-teal-dark">Location</th>
@@ -26,6 +27,8 @@
     <tbody>
         {% for trek in cancelled_treks %}
         <tr>
+            
+            <td class="text-teal-dark">{{ loop.index }}</td>
             <td class="text-teal-dark">{{ trek.id }}</td>
             <td class="text-teal-dark">{{ trek.name }}</td>
             <td class="text-teal-dark">{{ trek.location }}</td>

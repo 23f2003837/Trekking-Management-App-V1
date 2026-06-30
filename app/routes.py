@@ -325,10 +325,11 @@ def reject_staff(user_id):
 @login_as_admin
 def trekker_history(user_id):
     user=User.query.get_or_404(user_id)
-    # All bookings for this user, completed treks
-    history=Booking.query.join(Trek).filter(Booking.user_id==user_id,
-            Trek.status=='completed').order_by(Trek.end_date.desc()).all()
-    return render_template("trekker_history.html",user=user,history=history)
+    #All bookings for this user
+    history=Booking.query.join(Trek).filter(Booking.user_id==user_id).order_by(Trek.end_date.desc()).all()
+    completed_treks=Booking.query.join(Trek).filter(Booking.user_id==user_id,Booking.status=="completed").count()
+    cancelled_bookings=Booking.query.join(Trek).filter(Booking.user_id==user_id,Booking.status=="cancelled").count()
+    return render_template("trekker_history.html",user=user,history=history,completed_treks=completed_treks,cancelled_bookings=cancelled_bookings)
 
 #admin can view per staff trekking history where they have guided
 @main.route("/admin_dashboard/staff_history/<int:user_id>")

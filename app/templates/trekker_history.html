@@ -11,13 +11,16 @@
 <div class="card border-0 shadow-sm mb-3">
     <div class="card-body bg-ice rounded">
         <p class="mb-1 text-teal-dark"><strong>Email:</strong> {{ user.email }}</p>
-        <p class="mb-0 text-teal-dark"><strong>Total Completed Treks:</strong> {{ history|length }}</p>
+        <p class="mb-0 text-teal-dark"><strong>Total Booked Treks:</strong> {{ history|length }}</p>
+        <p class="mb-0 text-teal-dark"><strong>Total Completed Treks:</strong> {{ completed_treks }}</p>
+        <p class="mb-0 text-teal-dark"><strong>Total Cancelled Bookings:</strong> {{ cancelled_bookings }}</p>
     </div>
 </div>
 
 <table class="table table-hover">
     <thead>
         <tr>
+            <th class="text-teal-dark">#</th>
             <th class="text-teal-dark">Trek Name</th>
             <th class="text-teal-dark">Location</th>
             <th class="text-teal-dark">Start Date</th>
@@ -25,11 +28,14 @@
             <th class="text-teal-dark">Duration</th>
             <th class="text-teal-dark">Guide</th>
             <th class="text-teal-dark">Booking Date</th>
+            <th class="text-teal-dark">Booking Status</th>
+            <th class="text-teal-dark">Trek Status</th>
         </tr>
     </thead>
     <tbody>
         {% for booking in history %}
         <tr>
+            <td class="text-teal-dark">{{ loop.index }}</td>
             <td class="text-teal-dark">{{ booking.trek.name }}</td>
             <td class="text-teal-dark">{{ booking.trek.location }}</td>
             <td class="text-teal-dark">{{ booking.trek.start_date.strftime('%d %b %Y') }}</td>
@@ -37,10 +43,13 @@
             <td class="text-teal-dark">{{ booking.trek.duration }} days</td>
             <td class="text-teal-dark">{{ booking.trek.assigned_staff.name if booking.trek.assigned_staff else 'Not assigned' }}</td>
             <td class="text-teal-dark">{{ booking.booking_date.strftime('%d %b %Y') }}</td>
+            <td class="text-teal-dark">{{ booking.status }}</td>
+            <td class="text-teal-dark">{{ booking.trek.status }}</td>
+            
         </tr>
         {% else %}
         <tr>
-            <td colspan="7" class="text-center text-teal-dark">No completed treks yet!</td>
+            <td colspan="10" class="text-center text-teal-dark">No completed treks yet!</td>
         </tr>
         {% endfor %}
     </tbody>
