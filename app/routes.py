@@ -506,9 +506,16 @@ def browse_trek():
     query=Trek.query.filter(Trek.status=='open',Trek.assigned_staff_id!=None)
     if booked_ids:
         query=query.filter(~Trek.id.in_(booked_ids))
-    search = request.args.get('search', '')
-    if search:
-        query = query.filter(Trek.name.ilike(f'%{search}%'))
+    name=request.args.get('search', '')
+    difficulty=request.args.get("difficulty", "")
+    location=request.args.get("location", "")
+    if name:
+        query=query.filter(Trek.name.ilike(f'%{name}%'))
+    if difficulty:
+        query=query.filter(Trek.difficulty.ilike(f'%{difficulty}%'))
+    if location:
+        query=query.filter(Trek.location.ilike(f'%{location}%'))
+        
     browse_treks=query.order_by(Trek.start_date.asc()).all()
     return render_template("trekker_browse_trek.html",browse_treks=browse_treks)
 
