@@ -550,6 +550,15 @@ def cancel_booking(trek_id):
 @login_as_trekker
 def booking_history():
     user_id=session["user_id"]
-    query=Booking.query.filter(Booking.user_id==user_id).order_by(Booking.booking_date.desc())
+    query=Booking.query.filter(Booking.user_id==user_id,Booking.status=="booked").order_by(Booking.booking_date.desc())
     booked_treks=query.all()
     return render_template("trekker_my_bookings.html",booked_treks=booked_treks)
+
+#trekker can view their cancelled booking history
+@main.route("/trekker_dashboard/cancel_booking_history")
+@login_as_trekker
+def cancel_booking_history():
+    user_id=session["user_id"]
+    query=Booking.query.filter(Booking.user_id==user_id,Booking.status=="cancelled").order_by(Booking.booking_date.desc())
+    cancelled_bookings=query.all()
+    return render_template("trekker_cancelled_bookings.html",cancelled_bookings=cancelled_bookings)

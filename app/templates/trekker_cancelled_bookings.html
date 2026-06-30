@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center p-3">
-    <h5 class="text-teal-dark m-0">My Bookings</h5>
+    <h5 class="text-teal-dark m-0">My Cancelled Bookings</h5>
     <div class="d-flex justify-content-between align-items-center p-3">
-        <a class="text-teal-muted me-3" href="{{ url_for("main.cancel_booking_history") }}">← All Cancelled Bookings</a>
+        <a class="text-teal-muted me-3" href="{{ url_for("main.booking_history") }}">← All Bookings</a>
         <a class="text-teal-muted" href="{{ url_for("main.trekker_dashboard") }}">← Back to Dashboard</a>
 
     </div>
@@ -23,11 +23,10 @@
             <th class="text-teal-dark">Location</th>
             <th class="text-teal-dark">Start Date</th>
             <th class="text-teal-dark">End Date</th>
-            <th class="text-teal-dark">Cancel Booking</th>
         </tr>
     </thead>
     <tbody>
-        {% for booking in booked_treks %}
+        {% for booking in cancelled_bookings %}
         <tr>
             <td class="text-teal-dark">{{ loop.index }}</td>
             <td class="text-teal-dark">{{ booking.id }}</td>
@@ -37,17 +36,10 @@
             <td class="text-teal-dark">{{ booking.trek.location }}</td>
             <td class="text-teal-dark">{{ booking.trek.start_date.strftime('%d %b %Y') }}</td>
             <td class="text-teal-dark">{{ booking.trek.end_date.strftime('%d %b %Y') }}</td>
-            <td><form action="{{ url_for('main.cancel_booking',trek_id=booking.trek_id) }}" 
-                    method="POST" 
-                    style="display:inline;"
-                    onsubmit="return confirm('Are you sure you want to Cancel this booking?');">
-                    <button type="submit" class="btn bg-sage" style="text-decoration:none;">Cancel</button>
-                </form>
-            </td>
         </tr>
         {% else %}
         <tr>
-            <td colspan="9" class="text-center text-teal-dark">No Treks yet!</td>
+            <td colspan="8" class="text-center text-teal-dark">No Treks yet!</td>
         </tr>
         {% endfor %}
     </tbody>
