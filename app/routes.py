@@ -571,3 +571,12 @@ def cancel_booking_history():
     query=Booking.query.filter(Booking.user_id==user_id,Booking.status=="cancelled").order_by(Booking.booking_date.desc())
     cancelled_bookings=query.all()
     return render_template("trekker_cancelled_bookings.html",cancelled_bookings=cancelled_bookings)
+
+#trekker can view their completed booking history
+@main.route("/trekker_dashboard/complete_trek_history")
+@login_as_trekker
+def completed_trek():
+    user_id=session["user_id"]
+    query=Booking.query.filter(Booking.user_id==user_id,Booking.status=="completed").order_by(Booking.booking_date.desc())
+    completed_treks=query.all()
+    return render_template("trekker_completed_treks.html",completed_treks=completed_treks)
