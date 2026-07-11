@@ -136,7 +136,10 @@ def all_treks():
 @login_as_admin
 def cancelled_treks():
     search=request.args.get('search', '')
-    cancelled_treks=Trek.query.filter_by(status='cancelled').all()
+    query=Trek.query.filter_by(status='cancelled')
+    if search:
+        query=query.filter(Trek.name.ilike(f"%{search}%"))
+    cancelled_treks=query.all()
     return render_template("cancelled_treks.html",cancelled_treks=cancelled_treks)
 
 #admin creates trek
@@ -454,6 +457,9 @@ def progress_trek(trek_id):
         flash("Trek marked as started.")
     elif trek.status=='ongoing':
         trek.status='completed'
+        for booking in trek.bookings:
+            if booking.status=="booked":
+                booking.status="completed"
         flash("Trek marked as completed.")
     else:
         flash(f"Cannot progress trek from '{trek.status}' status.")    

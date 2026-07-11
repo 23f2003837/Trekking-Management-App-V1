@@ -1,5 +1,167 @@
 {% extends 'base.html' %}
+{% block title %}Safarnama{% endblock %}
 {% block content %}
-    <h3 class="text-teal-dark">Welcome to Trekking Management Application</h3>
-    <p class="text-teal-dark px-3">Book your trekking now</p>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Inter:wght@400;500&display=swap');
+
+  .hook-section {
+    padding: 4rem 2rem 3rem;
+    max-width: 680px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .hook-burdens {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .hook-word {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #888;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 0.5px solid #ddd;
+    background: #f9f9f9;
+    letter-spacing: 0.01em;
+  }
+
+  .hook-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 0 auto 2rem;
+    max-width: 360px;
+  }
+
+  .hook-line {
+    flex: 1;
+    height: 0.5px;
+    background: #ddd;
+  }
+
+  .hook-letgo {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: #555;
+    white-space: nowrap;
+  }
+
+  .hook-main {
+    font-family: 'Playfair Display', serif;
+    font-size: 46px;
+    font-weight: 700;
+    line-height: 1.15;
+    color: #1a1a1a;
+    margin: 0 0 1rem;
+  }
+
+  .hook-main-em {
+    font-style: italic;
+    font-weight: 400;
+    color: #388087;
+  }
+
+  .hook-sub {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: #555;
+    line-height: 1.8;
+    max-width: 480px;
+    margin: 0 auto 2rem;
+  }
+
+  .hook-cta {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 12px 36px;
+    border-radius: 8px;
+    border: none;
+    background: #388087;
+    color: #F6F6F2;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    display: inline-block;
+    margin-right: 12px;
+  }
+
+  .hook-cta-s {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 12px 36px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: transparent;
+    color: #1a1a1a;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .hook-mantra {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: #999;
+    margin-top: 1.5rem;
+    letter-spacing: 0.02em;
+  }
+</style>
+
+<div class="hook-section">
+
+  <div class="hook-burdens">
+    <span class="hook-word bg-sage">rejection?</span>
+    <span class="hook-word bg-sage">failure?</span>
+    <span class="hook-word bg-sage">bad decisions?</span>
+    <span class="hook-word bg-sage">heartbreak?</span>
+    <span class="hook-word bg-sage">betrayal?</span>
+    <span class="hook-word bg-sage">last priority?</span>
+    <span class="hook-word bg-sage">overthinking?</span>
+    <span class="hook-word bg-sage">detachment?</span>
+    <span class="hook-word bg-sage">self doubt?</span>
+    <span class="hook-word bg-sage">abandonment?</span>
+  </div>
+
+  <div class="hook-divider">
+    <div class="hook-line"></div>
+    <div class="hook-letgo">Let Go. Pack your Bags.</div>
+    <div class="hook-line"></div>
+  </div>
+
+  <h1 class="hook-main">
+    Plan yeh hai ki<br>
+    <span class="hook-main-em">koi plan nahi.</span>
+  </h1>
+
+  <p class="hook-sub">
+    The mountains don't care about your past. The trail only knows forward. Discover handpicked treks, book your spot, and go find the version of yourself that only exists out there.
+  </p>
+
+  {% if not session.user_id %}
+    <a href="{{ url_for('main.register') }}" class="hook-cta">Start your Safar</a>
+    <a href="{{ url_for('main.login') }}" class="hook-cta-s">Log In</a>
+  {% else %}
+    {% if session['role'] == 'admin' %}
+      <a href="{{ url_for('main.admin_dashboard') }}" class="hook-cta">Go to Dashboard →</a>
+    {% elif session['role'] == 'staff' %}
+      <a href="{{ url_for('main.staff_dashboard') }}" class="hook-cta">Go to Dashboard →</a>
+    {% else %}
+      <a href="{{ url_for('main.trekker_dashboard') }}" class="hook-cta">Go to Dashboard →</a>
+    {% endif %}
+  {% endif %}
+
+  <p class="hook-mantra">Kal pe sawaal hai — jeena filhal hai.</p>
+
+</div>
+
 {% endblock %}
