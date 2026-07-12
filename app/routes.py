@@ -187,7 +187,7 @@ def edit_trek(trek_id):
         trek.end_date=datetime.strptime(request.form['end_date'],"%Y-%m-%d")
         if trek.end_date<=trek.start_date:
             flash("End date must be after start date.")
-            return redirect(url_for("main.create_trek"))
+            return redirect(url_for("main.edit_trek"))
         booked_count=trek.total_slots-trek.available_slots
         trek.total_slots=int(request.form.get("total_slots"))
         trek.available_slots=trek.total_slots-booked_count
@@ -614,3 +614,17 @@ def completed_trek():
     query=Booking.query.filter(Booking.user_id==user_id,Booking.status=="completed").order_by(Booking.booking_date.desc())
     completed_treks=query.all()
     return render_template("trekker_completed_treks.html",completed_treks=completed_treks)
+
+
+#Api endpoint - returns open treks as JSON
+@main.route("/api/treks")
+def api_treks():
+    treks=Trek.query.filter_by(status='open').all()
+    return{
+        "treks":[
+            {"id":t.id,"name":t.name,"location":t.location,"difficulty":t.difficulty,
+                "available_slots":t.available_slots,"start_date":t.start_date.strftime('%Y-%m-%d'),
+                "end_date":t.end_date.strftime('%Y-%m-%d'),"duration":t.duration,"description":t.description
+            }
+            for t in treks]
+    }
