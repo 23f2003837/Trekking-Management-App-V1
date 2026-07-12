@@ -158,6 +158,9 @@ def create_trek():
         status=request.form.get('status')
         assigned_staff_id=request.form.get('assigned_staff_id')
         assigned_staff_id=int(assigned_staff_id) if assigned_staff_id else None
+        if end_date<=start_date:
+            flash("End date must be after start date.")
+            return redirect(url_for("main.create_trek"))
         new_trek=Trek(name=name,location=location,difficulty=difficulty,start_date=start_date,end_date=end_date
                       ,total_slots=total_slots,available_slots=total_slots,duration=duration,description=description,
                       status=status,assigned_staff_id=assigned_staff_id)
@@ -173,12 +176,18 @@ def create_trek():
 @login_as_admin
 def edit_trek(trek_id):
     trek=Trek.query.get_or_404(trek_id)
+    if trek.status in ['ongoing','completed']:
+        flash("Cannot edit a trek that is ongoing or completed. It is frozen for historical record.")
+        return redirect(url_for("main.all_treks"))
     if request.method=='POST':
         trek.name=request.form.get('name')
         trek.location=request.form.get('location')
         trek.difficulty=request.form.get('difficulty')
         trek.start_date=datetime.strptime(request.form['start_date'],"%Y-%m-%d")
         trek.end_date=datetime.strptime(request.form['end_date'],"%Y-%m-%d")
+        if trek.end_date<=trek.start_date:
+            flash("End date must be after start date.")
+            return redirect(url_for("main.create_trek"))
         booked_count=trek.total_slots-trek.available_slots
         trek.total_slots=int(request.form.get("total_slots"))
         trek.available_slots=trek.total_slots-booked_count
@@ -537,16 +546,24 @@ def book_trek(trek_id):
     if trek.available_slots<1:
         flash("Sorry, This Trek has no slots left")
         return redirect(url_for("main.browse_trek"))
-    existing=Booking.query.filter_by(trek_id=trek_id,user_id=user_id).filter(Booking.status!="cancelled").first()
+    existing=Booking.query.filter_by(trek_id=trek_id,user_id=user_id).first()
     if existing:
-        flash("You have already Booked this Trek!")
-        return redirect(url_for("main.browse_trek"))
-    booking=Booking(user_id=user_id,trek_id=trek_id,status='booked')
-    db.session.add(booking)
-    trek.available_slots-=1
-    db.session.commit()
-    flash("Trek booked successfully!")
-    return redirect(url_for("main.trekker_dashboard"))
+        if existing.status!="cancelled":
+            flash("You have already Booked this Trek!")
+            return redirect(url_for("main.browse_trek"))
+        else:
+            existing.status='booked'
+            trek.available_slots-=1
+            db.session.commit()
+            flash("Booking reactivated successfully")
+            return redirect(url_for("main.trekker_dashboard"))
+    else:
+        booking=Booking(user_id=user_id,trek_id=trek_id,status='booked')
+        db.session.add(booking)
+        trek.available_slots-=1
+        db.session.commit()
+        flash("Trek booked successfully!")
+        return redirect(url_for("main.trekker_dashboard"))
 
 #trekker cancels a trek booking
 @main.route("/trekker_dashboard/cancel_booking/<int:trek_id>",methods=['POST'])
