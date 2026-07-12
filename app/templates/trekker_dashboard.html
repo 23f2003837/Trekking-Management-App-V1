@@ -41,7 +41,8 @@
     <h5 class="text-teal-dark m-0">Upcoming Treks</h5>
     <a class="text-teal-muted me-4" href="{{ url_for("main.browse_trek") }}">Browse All Treks</a>
 </div>
-<div class="table-responsive" >
+
+<div class="table-responsive">
 <table class="table table-hover table-sm">
     <thead>
         <tr>
@@ -86,13 +87,13 @@
         {% endfor %}
     </tbody>
 </table>
-
+</div>
 <!-- recent bookings -->
  <div class="d-flex justify-content-between align-items-center p-3">
     <h5 class="text-teal-dark m-0">Recent Booked Treks</h5>
     <a class="text-teal-muted me-4" href="{{ url_for("main.booking_history") }}">All Bookings</a>
 </div>
-<div class="table-responsive" >
+<div class="table-responsive">
 <table class="table table-hover">
     <thead>
         <tr>
@@ -123,6 +124,5 @@
         {% endfor %}
     </tbody>
 </table>
-</div>
 </div>
 {% endblock %}

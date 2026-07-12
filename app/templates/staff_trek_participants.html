@@ -6,7 +6,8 @@
         <a href="{{ url_for('main.staff_manage_trek', trek_id=trek.id) }}" class="text-teal-muted">← Back to Manage Trek</a>
     </div>
     <p class="text-teal-dark"><strong>Total Participants:</strong> {{ bookings|length }}</p>
-    <table class="table">
+    <div class="table-responsive">
+    <table class="table table-hover">
         <thead>
             <tr>
                 <th class="text-teal-dark">#</th>
@@ -38,7 +39,7 @@
     <div class="d-flex justify-content-between align-items-center p-3">
         <h2 class="text-teal-dark m-0">Cancelled Participants</h2>
     </div>
-    
+    <div class="table-responsive">
     <table class="table table-hover">
         <thead>
             <tr>
@@ -65,5 +66,6 @@
             {% endfor %}
         </tbody>
     </table>
+    </div>
 </div>
 {% endblock %}

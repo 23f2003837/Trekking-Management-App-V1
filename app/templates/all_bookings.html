@@ -13,6 +13,7 @@
     <input type="text" name="search" placeholder="Search by Trek name.." class="form-control text-teal-muted bg-offwhite" value="{{ request.args.get('search','') }}">
 </form>
 
+<div class="table-responsive">
 <table class="table table-hover">
     <thead>
         <tr>
@@ -41,5 +42,5 @@
         {% endfor %}
     </tbody>
 </table>
-
+</div>
 {% endblock %}
