@@ -36,7 +36,8 @@
         <tr>
             <td class="text-teal-dark">{{ loop.index }}</td>
             <td class="text-teal-dark">{{ trek.id }}</td>
-            <td class="text-teal-dark">{{ trek.name }}</td>
+            <td><a class="text-teal-dark" href="{{ url_for('main.trek_detail', trek_id=trek.id) }}" 
+                class="text-decoration-none">{{ trek.name }}</a></td>
             <td class="text-teal-dark">{{ trek.location }}</td>
             <td class="text-teal-dark">{{ trek.start_date.strftime('%d %b %Y') }}</td>
             <td class="text-teal-dark">{{ trek.end_date.strftime('%d %b %Y') }}</td>

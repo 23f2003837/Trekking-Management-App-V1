@@ -615,6 +615,16 @@ def completed_trek():
     completed_treks=query.all()
     return render_template("trekker_completed_treks.html",completed_treks=completed_treks)
 
+#trekker can view detailed trek page
+@main.route("/trekker_dashboard/trek/<int:trek_id>")
+@login_as_trekker
+def trek_detail(trek_id):
+    trek=Trek.query.get_or_404(trek_id)
+    if trek.status!="open":
+        flash("This trek is not available for booking")
+        return redirect(url_for("main.browse_trek"))
+    already_booked=Booking.query.filter_by(trek_id=trek_id,user_id=session['user_id']).filter(Booking.status!='cancelled').first()
+    return render_template("trek_detail.html",trek=trek,already_booked=already_booked)
 
 #Api endpoint - returns open treks as JSON
 @main.route("/api/treks")
