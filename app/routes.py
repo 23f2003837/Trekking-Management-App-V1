@@ -152,7 +152,7 @@ def create_trek():
         difficulty=request.form.get('difficulty')
         start_date=datetime.strptime(request.form['start_date'],"%Y-%m-%d")
         end_date=datetime.strptime(request.form['end_date'],"%Y-%m-%d")
-        total_slots=int(request.form.get("total_slots"))
+        total_slots=int(request.form.get("total_slots") or 0)
         duration=(end_date-start_date).days+1
         description=request.form.get('description')
         status=request.form.get('status')
@@ -187,9 +187,13 @@ def edit_trek(trek_id):
         trek.end_date=datetime.strptime(request.form['end_date'],"%Y-%m-%d")
         if trek.end_date<=trek.start_date:
             flash("End date must be after start date.")
-            return redirect(url_for("main.edit_trek"))
+            return redirect(url_for("main.edit_trek",trek_id=trek.id))
         booked_count=trek.total_slots-trek.available_slots
-        trek.total_slots=int(request.form.get("total_slots"))
+        new_total_slots=int(request.form.get("total_slots") or 0)
+        if new_total_slots < booked_count:
+            flash(f"Total slots cannot be less than {booked_count}, the number of people already booked.")
+            return redirect(url_for("main.edit_trek",trek_id=trek.id))
+        trek.total_slots = new_total_slots
         trek.available_slots=trek.total_slots-booked_count
         trek.duration=(trek.end_date-trek.start_date).days+1
         trek.description=request.form.get('description')
