@@ -563,8 +563,8 @@ def book_trek(trek_id):
                 existing.status='booked'
                 trek.available_slots-=1
                 db.session.commit()
-                flash("Booking reactivated successfully")
-                return redirect(url_for("main.trekker_dashboard"))
+                flash("Trek booked successfully!")
+                return redirect(url_for("main.booking_history"))
             else:
                 flash("Sorry, this trek is now fully booked.")
                 return redirect(url_for("main.browse_trek"))
