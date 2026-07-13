@@ -8,7 +8,7 @@ with app.app_context():
         admin=User(
         name='admin',
         email='admin@trekking.com',
-        password=generate_password_hash('whotfareu'),
+        password=generate_password_hash('admin123'),
         role='admin',
         is_approved=True
         )
