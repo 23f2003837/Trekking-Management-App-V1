@@ -286,6 +286,9 @@ def blacklist_staff(user_id):
     status="Blacklisted" if user.is_blacklisted else "Removed from blacklist"
     flash(f"{status} successfully")
     if status=='Blacklisted':
+        assigned_treks=Trek.query.filter_by(assigned_staff_id=user_id,status='open').count()
+        if assigned_treks>0:
+            flash(f"This staff has {assigned_treks} active treks assigned. Please reassign them to another guide.")
         return redirect(url_for("main.all_staffs"))
     else:
         return redirect(url_for("main.blacklisted_staff_list"))
