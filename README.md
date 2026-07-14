@@ -13,7 +13,7 @@
 
 ## Default Admin Credentials
 Email: admin@trekking.com
-Password: admin123
+Password: admin123 
 
 ## Tech Stack
 Flask, SQLite, SQLAlchemy, Jinja2, Bootstrap 5
